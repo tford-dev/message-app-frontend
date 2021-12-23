@@ -12,7 +12,6 @@ import { SearchOutlined } from '@material-ui/icons';
 const Sidebar = () => {
     return (
         <Container>
-            <h1>Side bar</h1>
             <SidebarHeader>
                 <Avatar src="https://avatars.githubusercontent.com/u/64376406?s=40&v=4" />
                 <SidebarHeaderRight>
