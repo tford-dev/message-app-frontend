@@ -1,10 +1,26 @@
 import { Avatar, IconButton } from '@material-ui/core';
 import { AttachFile, InsertEmoticon, MoreVert, SearchOutlined } from '@material-ui/icons';
-import React from 'react';
+import React, { useState } from 'react'
 import styled from "styled-components";
 import MicIcon from "@material-ui/icons/Mic";
+import '../App.css';
+import Axios from '../Axios';
 
-const Chat = () => {
+const Chat = ({messages}) => {
+    const [input, setInput] = useState("");
+
+    const sendMessage = async (e) => {
+        e.preventDefault();
+        await Axios.post("/messages/new", {
+            message: input,
+            name: "Demo App",
+            timestamp: "Just now",
+            recieved: false,
+        })
+
+        setInput('');
+    }
+
     return (
         <Container>
             <ChatHeader>
@@ -31,24 +47,20 @@ const Chat = () => {
             </ChatHeader>
 
             <ChatBody>
-                <ChatMessage>
-                    <ChatName>Terry</ChatName>
-                    This be a message mate 
-                    <ChatTimeStamp>{new Date().toUTCString()}</ChatTimeStamp>
-                </ChatMessage>
-
-                <ChatReciever>
-                    <ChatName>John</ChatName>
-                    This be a message lad 
-                    <ChatTimeStamp>{new Date().toUTCString()}</ChatTimeStamp>
-                </ChatReciever>
+                {messages.map(message => (
+                    <ChatMessage key={message._id} className={!message.recieved && "chat__reciever"}>
+                        <ChatName>{message.name}</ChatName>
+                        {message.message}
+                        <ChatTimeStamp>{message.timestamp}</ChatTimeStamp>
+                    </ChatMessage>
+                ))}
             </ChatBody>
 
             <ChatFooter>
                 <InsertEmoticon />
                 <form>
-                    <input placeholder="Type a message" type="text" />
-                    <button type="submit">Send a message</button>
+                    <input value={input} onChange={e => setInput(e.target.value)} placeholder="Type a message" type="text" />
+                    <button onClick={sendMessage} type="submit">Send a message</button>
                 </form>
                 <MicIcon />
             </ChatFooter>
@@ -105,17 +117,17 @@ const ChatMessage = styled.p`
     margin-bottom: 30px;
 `;
 
-const ChatReciever = styled.p`
-    position: relative;
-    font-size: 16px;
-    padding: 10px;
-    width: fit-content;
-    border-radius: 10px;
-    background-color: #fff;
-    margin-bottom: 30px;
-    margin-left: auto;
-    background-color: #dcf8c6;
-`;
+// const ChatReciever = styled.p`
+//     position: relative;
+//     font-size: 16px;
+//     padding: 10px;
+//     width: fit-content;
+//     border-radius: 10px;
+//     background-color: #fff;
+//     margin-bottom: 30px;
+//     margin-left: auto;
+//     background-color: #dcf8c6;
+// `;
 
 const ChatName = styled.span`
     position: absolute;
@@ -146,6 +158,7 @@ const ChatFooter = styled.div`
         border-radius: 30px;
         padding: 10px;
         border: none;
+        outline-width: 0;
     }
     //Button will be activated on enter
     & > form > button {
